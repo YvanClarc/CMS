@@ -22,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -48,5 +49,29 @@ class User extends Authenticatable
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Check if user is an admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if user is a lawyer.
+     */
+    public function isLawyer(): bool
+    {
+        return $this->role === 'lawyer';
+    }
+
+    /**
+     * Check if user is a client.
+     */
+    public function isClient(): bool
+    {
+        return $this->role === 'client';
     }
 }
