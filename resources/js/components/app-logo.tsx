@@ -8,7 +8,10 @@ export default function AppLogo() {
             </div>
             <div className="ml-1 grid flex-1 text-left text-sm">
                 <span className="mb-0.5 truncate leading-tight font-semibold">
-                    Laravel Starter Kit
+                    MGC
+                </span>
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                    Case Management System
                 </span>
             </div>
         </>
