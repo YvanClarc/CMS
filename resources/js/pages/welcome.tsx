@@ -78,7 +78,7 @@ export default function Welcome({
                                     <span className="block gradient-text">with Confidence</span>
                                 </h1>
                                 <p className="animate-slide-up text-lg sm:text-xl text-slate-600 dark:text-slate-300 mb-8" style={{ animationDelay: '100ms' }}>
-                                    A comprehensive platform for lawyers, clients, and administrators to collaborate efficiently on legal cases with secure document management and real-time communication.
+                                    A comprehensive platform for clients and administrators to collaborate efficiently on legal cases with secure document management and real-time communication.
                                 </p>
                                 <div className="animate-slide-up flex flex-col sm:flex-row gap-4" style={{ animationDelay: '200ms' }}>
                                     {!auth.user && canRegister && (
@@ -121,11 +121,11 @@ export default function Welcome({
                                 Designed for Legal Professionals
                             </h2>
                             <p className="text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
-                                Built with the needs of lawyers, clients, and legal administrators in mind
+                                Built with the needs of clients and legal administrators in mind
                             </p>
                         </div>
 
-                        <div className="grid md:grid-cols-3 gap-8">
+                        <div className="grid md:grid-cols-2 gap-8">
                             {/* Admin Features */}
                             <AnimatedCard
                                 title="For Administrators"
@@ -152,38 +152,11 @@ export default function Welcome({
                                 </ul>
                             </AnimatedCard>
 
-                            {/* Lawyer Features */}
-                            <AnimatedCard
-                                title="For Lawyers"
-                                icon="📋"
-                                delay={1}
-                                className="md:scale-105"
-                            >
-                                <ul className="space-y-3 text-slate-600 dark:text-slate-400">
-                                    <li className="flex items-center gap-3">
-                                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 text-sm font-bold">✓</span>
-                                        Track active cases
-                                    </li>
-                                    <li className="flex items-center gap-3">
-                                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 text-sm font-bold">✓</span>
-                                        Manage clients
-                                    </li>
-                                    <li className="flex items-center gap-3">
-                                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 text-sm font-bold">✓</span>
-                                        Upload documents
-                                    </li>
-                                    <li className="flex items-center gap-3">
-                                        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 text-sm font-bold">✓</span>
-                                        Set reminders
-                                    </li>
-                                </ul>
-                            </AnimatedCard>
-
                             {/* Client Features */}
                             <AnimatedCard
                                 title="For Clients"
                                 icon="👤"
-                                delay={2}
+                                delay={1}
                             >
                                 <ul className="space-y-3 text-slate-600 dark:text-slate-400">
                                     <li className="flex items-center gap-3">
@@ -196,7 +169,7 @@ export default function Welcome({
                                     </li>
                                     <li className="flex items-center gap-3">
                                         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-900 text-pink-600 dark:text-pink-400 text-sm font-bold">✓</span>
-                                        Communicate with lawyer
+                                        Stay updated on progress
                                     </li>
                                     <li className="flex items-center gap-3">
                                         <span className="flex h-6 w-6 items-center justify-center rounded-full bg-pink-100 dark:bg-pink-900 text-pink-600 dark:text-pink-400 text-sm font-bold">✓</span>
@@ -252,7 +225,7 @@ export default function Welcome({
                             <div className="hidden md:block absolute top-20 left-1/3 right-1/3 h-1 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 -z-10"></div>
 
                             {[
-                                { num: 1, title: 'Create Account', desc: 'Sign up as an Admin, Lawyer, or Client with just a few clicks', color: 'from-blue-600 to-blue-700' },
+                                { num: 1, title: 'Create Account', desc: 'Sign up as an Admin or Client with just a few clicks', color: 'from-blue-600 to-blue-700' },
                                 { num: 2, title: 'Set Up Cases', desc: 'Create and manage cases with relevant documents and details', color: 'from-purple-600 to-purple-700' },
                                 { num: 3, title: 'Collaborate & Track', desc: 'Work together with secure messaging and real-time updates', color: 'from-pink-600 to-pink-700' },
                             ].map((step, index) => (
@@ -289,7 +262,7 @@ export default function Welcome({
                             Ready to Streamline Your Legal Practice?
                         </h2>
                         <p className="animate-slide-up text-xl text-blue-100 mb-8 max-w-2xl mx-auto" style={{ animationDelay: '100ms' }}>
-                            Join lawyers and law firms who are already using LegalCase to manage their cases more efficiently
+                            Join organizations already using LegalCase to manage their cases more efficiently
                         </p>
                         {!auth.user && canRegister && (
                             <Link

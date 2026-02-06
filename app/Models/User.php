@@ -23,6 +23,15 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'status',
+        'avatar',
+        'phone',
+        'bio',
+        'address',
+        'city',
+        'state',
+        'zip_code',
+        'country',
     ];
 
     /**
@@ -60,18 +69,34 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is a lawyer.
-     */
-    public function isLawyer(): bool
-    {
-        return $this->role === 'lawyer';
-    }
-
-    /**
      * Check if user is a client.
      */
     public function isClient(): bool
     {
         return $this->role === 'client';
+    }
+
+    /**
+     * Check if user account is active.
+     */
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    /**
+     * Check if user account is pending.
+     */
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    /**
+     * Check if user account is declined.
+     */
+    public function isDeclined(): bool
+    {
+        return $this->status === 'declined';
     }
 }

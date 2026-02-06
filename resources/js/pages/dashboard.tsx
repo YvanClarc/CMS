@@ -18,7 +18,7 @@ export default function Dashboard() {
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4">
                 {/* Welcome Banner */}
                 <div className="animate-slide-up rounded-3xl bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-8 text-white shadow-2xl">
-                    <h1 className="text-3xl font-bold mb-2">Welcome to LegalCase</h1>
+                    <h1 className="text-3xl font-bold mb-2">Welcome to MGC Case Management</h1>
                     <p className="text-blue-100">Manage your legal cases efficiently with our modern platform</p>
                 </div>
 

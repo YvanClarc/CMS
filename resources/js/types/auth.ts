@@ -3,6 +3,13 @@ export type User = {
     name: string;
     email: string;
     avatar?: string;
+    phone?: string;
+    bio?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    zip_code?: string;
+    country?: string;
     email_verified_at: string | null;
     two_factor_enabled?: boolean;
     created_at: string;
