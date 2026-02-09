@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agreement;
 use App\Models\CaseRequest;
 use App\Models\CaseRequestDocument;
 use Illuminate\Http\Request;
@@ -20,8 +21,14 @@ class CaseController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $agreements = Agreement::where('client_id', auth()->id())
+            ->with('caseRequest')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return Inertia::render('client/cases', [
             'cases' => $cases,
+            'agreements' => $agreements,
         ]);
     }
 
@@ -31,14 +38,39 @@ class CaseController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            // Basics
             'title' => 'required|string|max:255',
+            'case_category' => 'required|string|in:labor_dispute,family_law,debt_collection,criminal_defense,contract_dispute,personal_injury,real_estate,other',
+            'adverse_party_name' => 'required|string|max:255',
+            'adverse_party_email' => 'nullable|email',
+            'adverse_party_phone' => 'nullable|string|max:20',
+            'incident_date' => 'required|date|before_or_equal:today',
+            
+            // Narrative & Facts
+            'case_summary' => 'required|string|min:50',
             'description' => 'required|string|min:10',
+            'key_witnesses' => 'nullable|string',
+            'damages_objective' => 'required|string|max:500',
+            
+            // Administrative/Financial
+            'has_existing_counsel' => 'boolean',
+            'fee_preference' => 'required|string|in:contingency,hourly,flat_fee',
         ]);
 
         $case = CaseRequest::create([
             'user_id' => auth()->id(),
             'title' => $validated['title'],
+            'case_category' => $validated['case_category'],
+            'adverse_party_name' => $validated['adverse_party_name'],
+            'adverse_party_email' => $validated['adverse_party_email'] ?? null,
+            'adverse_party_phone' => $validated['adverse_party_phone'] ?? null,
+            'incident_date' => $validated['incident_date'],
+            'case_summary' => $validated['case_summary'],
             'description' => $validated['description'],
+            'key_witnesses' => $validated['key_witnesses'] ?? null,
+            'damages_objective' => $validated['damages_objective'],
+            'has_existing_counsel' => $validated['has_existing_counsel'] ?? false,
+            'fee_preference' => $validated['fee_preference'],
             'status' => 'pending',
         ]);
 
@@ -56,8 +88,23 @@ class CaseController extends Controller
         }
 
         $validated = $request->validate([
+            // Basics
             'title' => 'required|string|max:255',
+            'case_category' => 'required|string|in:labor_dispute,family_law,debt_collection,criminal_defense,contract_dispute,personal_injury,real_estate,other',
+            'adverse_party_name' => 'required|string|max:255',
+            'adverse_party_email' => 'nullable|email',
+            'adverse_party_phone' => 'nullable|string|max:20',
+            'incident_date' => 'required|date|before_or_equal:today',
+            
+            // Narrative & Facts
+            'case_summary' => 'required|string|min:50',
             'description' => 'required|string|min:10',
+            'key_witnesses' => 'nullable|string',
+            'damages_objective' => 'required|string|max:500',
+            
+            // Administrative/Financial
+            'has_existing_counsel' => 'boolean',
+            'fee_preference' => 'required|string|in:contingency,hourly,flat_fee',
         ]);
 
         $case->update($validated);

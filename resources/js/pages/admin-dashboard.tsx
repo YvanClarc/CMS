@@ -2,7 +2,7 @@ import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { AnimatedStatCard } from '@/components/animated-stat-card';
-import { Users, BarChart3, AlertCircle } from 'lucide-react';
+import { Users, BarChart3, FileText } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,13 +13,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface Props {
     totalUsers: number;
+    pendingCaseRequests: number;
 }
 
-export default function AdminDashboard({ totalUsers }: Props) {
+export default function AdminDashboard({ totalUsers, pendingCaseRequests }: Props) {
     const stats = [
         { title: 'Total Users', value: totalUsers, icon: <Users size={24} />, color: 'blue' as const, trend: { value: 12, isPositive: true } },
-        { title: 'Total Cases', value: 156, icon: <BarChart3 size={24} />, color: 'purple' as const, trend: { value: 8, isPositive: true } },
-        { title: 'Active Clients', value: 198, icon: <AlertCircle size={24} />, color: 'pink' as const, trend: { value: 15, isPositive: true } },
+        { title: 'Pending Case Requests', value: pendingCaseRequests, icon: <FileText size={24} />, color: 'amber' as const, trend: { value: 5, isPositive: false } },
+        { title: 'Active Cases', value: 156, icon: <BarChart3 size={24} />, color: 'purple' as const, trend: { value: 8, isPositive: true } },
     ];
 
     return (

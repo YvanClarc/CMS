@@ -39,6 +39,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('admin/dashboard', function () {
             return Inertia::render('admin-dashboard', [
                 'totalUsers' => \App\Models\User::count(),
+                'pendingCaseRequests' => \App\Models\CaseRequest::where('status', 'pending')->count(),
             ]);
         })->middleware('role:admin')->name('admin-dashboard');
 
@@ -51,6 +52,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::resource('users', UserController::class);
             Route::post('users/{user}/approve', [UserController::class, 'approve'])->name('users.approve');
             Route::post('users/{user}/decline', [UserController::class, 'decline'])->name('users.decline');
+            
+            // Case request review routes
+            Route::get('case-requests', [\App\Http\Controllers\CaseRequestController::class, 'index'])->name('case-requests.index');
+            Route::get('case-requests/{caseRequest}', [\App\Http\Controllers\CaseRequestController::class, 'show'])->name('case-requests.show');
+            Route::post('case-requests/{caseRequest}/accept', [\App\Http\Controllers\CaseRequestController::class, 'accept'])->name('case-requests.accept');
+            Route::post('case-requests/{caseRequest}/reject', [\App\Http\Controllers\CaseRequestController::class, 'reject'])->name('case-requests.reject');
+            Route::post('case-requests/{caseRequest}/request-info', [\App\Http\Controllers\CaseRequestController::class, 'requestInfo'])->name('case-requests.request-info');
+            Route::post('case-requests/{caseRequest}/decline', [\App\Http\Controllers\CaseRequestController::class, 'decline'])->name('case-requests.decline');
         });
 
         // Client case management routes
@@ -61,6 +70,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::delete('cases/{case}', [CaseController::class, 'destroy'])->name('cases.destroy');
             Route::post('cases/{case}/documents', [CaseController::class, 'uploadDocument'])->name('cases.uploadDocument');
             Route::delete('cases/{case}/documents/{document}', [CaseController::class, 'deleteDocument'])->name('cases.deleteDocument');
+            
+            // Agreement signing routes
+            Route::post('agreements/{agreement}/sign', [\App\Http\Controllers\CaseRequestController::class, 'signAgreement'])->name('agreements.sign');
+            Route::post('agreements/{agreement}/decline', [\App\Http\Controllers\CaseRequestController::class, 'declineAgreement'])->name('agreements.decline');
         });
     });
 });

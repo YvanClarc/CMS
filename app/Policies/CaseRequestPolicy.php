@@ -13,7 +13,7 @@ class CaseRequestPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
@@ -21,7 +21,7 @@ class CaseRequestPolicy
      */
     public function view(User $user, CaseRequest $caseRequest): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
@@ -46,6 +46,22 @@ class CaseRequestPolicy
     public function delete(User $user, CaseRequest $caseRequest): bool
     {
         return false;
+    }
+
+    /**
+     * Determine whether the user can accept the case request.
+     */
+    public function accept(User $user, CaseRequest $caseRequest): bool
+    {
+        return $user->isAdmin();
+    }
+
+    /**
+     * Determine whether the user can reject the case request.
+     */
+    public function reject(User $user, CaseRequest $caseRequest): bool
+    {
+        return $user->isAdmin();
     }
 
     /**

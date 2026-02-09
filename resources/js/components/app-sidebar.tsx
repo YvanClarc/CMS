@@ -53,6 +53,14 @@ export function AppSidebar() {
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
+                                    <Link href="/admin/case-requests" prefetch>
+                                        <FileText size={20} />
+                                        <span>Case Requests</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
                                     <Link href="/admin/users" prefetch>
                                         <Users size={20} />
                                         <span>Manage Users</span>
