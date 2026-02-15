@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Users, FileText } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, Users, FileText, FileSignature } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -61,6 +61,14 @@ export function AppSidebar() {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
+                                    <Link href="/admin/agreements" prefetch>
+                                        <FileSignature size={20} />
+                                        <span>Agreements</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
                                     <Link href="/admin/users" prefetch>
                                         <Users size={20} />
                                         <span>Manage Users</span>
@@ -81,6 +89,14 @@ export function AppSidebar() {
                                     <Link href="/client/cases" prefetch>
                                         <FileText size={20} />
                                         <span>My Cases</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild>
+                                    <Link href="/agreements" prefetch>
+                                        <FileSignature size={20} />
+                                        <span>My Agreements</span>
                                     </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

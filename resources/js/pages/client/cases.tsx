@@ -441,25 +441,8 @@ export default function CasesPage(props: Props) {
   };
 
   const handleSignAgreement = async (agreement: Agreement) => {
-    if (!confirm('By signing this agreement, you authorize our law firm to represent you in the described matter. Do you understand and agree?')) {
-      return;
-    }
-
-    setSigningAgreement(true);
-    router.post(`/client/agreements/${agreement.id}/sign`, {}, {
-      onSuccess: () => {
-        setShowAgreementModal(false);
-        setViewingAgreement(null);
-        setSigningAgreement(false);
-        setSuccessMessage('Agreement signed successfully! Your case is now active.');
-        // Refresh agreements
-        router.get('/client/cases', {}, { only: ['agreements'] });
-      },
-      onError: () => {
-        setSigningAgreement(false);
-        alert('Error signing agreement. Please try again.');
-      },
-    });
+    // Redirect to the signature page instead of posting
+    window.location.href = `/client/agreements/${agreement.id}/sign`;
   };
 
   const handleDeclineAgreement = async (agreement: Agreement) => {

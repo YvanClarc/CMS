@@ -20,11 +20,20 @@ class Agreement extends Model
         'signed_document_path',
         'decline_reason',
         'declined_at',
+        'signature_image',
+        'signer_ip_address',
+        'signer_user_agent',
+        'signature_timestamp',
+        'signer_name',
+        'signer_email',
+        'signature_token',
+        'signed_pdf_path',
     ];
 
     protected $casts = [
         'signed_at' => 'datetime',
         'declined_at' => 'datetime',
+        'signature_timestamp' => 'datetime',
     ];
 
     /**
@@ -73,5 +82,39 @@ class Agreement extends Model
     public function isDeclined(): bool
     {
         return $this->status === 'declined';
+    }
+
+    /**
+     * Check if agreement is signed with a valid signature.
+     */
+    public function hasValidSignature(): bool
+    {
+        return $this->status === 'signed' && !empty($this->signature_image);
+    }
+
+    /**
+     * Get the signature audit trail.
+     */
+    public function getSignatureAuditTrail(): array
+    {
+        return [
+            'signed_at' => $this->signed_at,
+            'signer_name' => $this->signer_name,
+            'signer_email' => $this->signer_email,
+            'ip_address' => $this->signer_ip_address,
+            'signature_timestamp' => $this->signature_timestamp,
+        ];
+    }
+
+    /**
+     * Get the signature image URL.
+     */
+    public function getSignatureImageUrl(): ?string
+    {
+        if (!$this->signature_image) {
+            return null;
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('public')->url($this->signature_image);
     }
 }
