@@ -15,6 +15,12 @@ class SignatureService
      */
     public function storeSignature(Agreement $agreement, array $data, Request $request): Agreement
     {
+        \Log::info('storeSignature called', [
+            'agreement_id' => $agreement->id,
+            'data_keys' => array_keys($data),
+            'signature_image_length' => isset($data['signature_image']) ? strlen($data['signature_image']) : 'null',
+        ]);
+
         try {
             // Extract signature data
             $signatureImage = $data['signature_image'] ?? null;
@@ -41,6 +47,21 @@ class SignatureService
                 'signed_at' => now(),
             ]);
 
+            // Update the associated case request status to in_progress
+            if ($agreement->caseRequest) {
+                $agreement->caseRequest->update([
+                    'status' => 'in_progress',
+                    'notes' => 'Agreement signed by client. Case is now active.',
+                ]);
+            }
+
+            // Update the legal case status to active
+            if ($agreement->case) {
+                $agreement->case->update([
+                    'status' => 'active',
+                ]);
+            }
+
             return $agreement;
         } catch (Exception $e) {
             \Log::error('Signature storage error: ' . $e->getMessage());
@@ -54,27 +75,46 @@ class SignatureService
     private function saveSignatureImage(string $signatureData, int $agreementId): string
     {
         try {
+            \Log::info('Saving signature image', [
+                'agreement_id' => $agreementId,
+                'data_length' => strlen($signatureData),
+                'starts_with_data' => strpos($signatureData, 'data:image') === 0,
+            ]);
+
             // Remove data URI prefix if present
             if (strpos($signatureData, 'data:image') === 0) {
                 $signatureData = preg_replace('#^data:image/\w+;base64,#i', '', $signatureData);
+                \Log::info('Removed data URI prefix', ['data_length_after' => strlen($signatureData)]);
             }
 
             // Decode base64
             $imageData = base64_decode($signatureData, true);
 
             if ($imageData === false) {
+                \Log::error('Base64 decode failed', ['signature_data' => substr($signatureData, 0, 100)]);
                 throw new Exception('Invalid base64 signature data');
             }
+
+            \Log::info('Base64 decode successful', ['decoded_length' => strlen($imageData)]);
 
             // Generate file name
             $fileName = "signatures/agreement_{$agreementId}_" . time() . '.png';
 
             // Store the image
-            Storage::disk('public')->put($fileName, $imageData);
+            $stored = Storage::disk('public')->put($fileName, $imageData);
+
+            if (!$stored) {
+                throw new Exception('Failed to store signature image');
+            }
+
+            \Log::info('Signature image stored', ['file_name' => $fileName, 'file_exists' => Storage::disk('public')->exists($fileName)]);
 
             return $fileName;
         } catch (Exception $e) {
-            \Log::error('Signature image save error: ' . $e->getMessage());
+            \Log::error('Signature image save error: ' . $e->getMessage(), [
+                'agreement_id' => $agreementId,
+                'trace' => $e->getTraceAsString(),
+            ]);
             throw $e;
         }
     }
@@ -178,7 +218,7 @@ class SignatureService
             'signer_email' => $agreement->signer_email,
             'ip_address' => $agreement->signer_ip_address,
             'signature_token' => $agreement->signature_token,
-            'signature_image_url' => Storage::disk('public')->url($agreement->signature_image),
+            'signature_image_url' => '/storage/' . $agreement->signature_image,
         ];
     }
 }

@@ -50,6 +50,8 @@ class SignatureController extends Controller
             'user_role' => $user?->role,
         ]);
 
+        \Log::info('Request data keys:', array_keys($request->all()));
+
         try {
             $this->authorize('update', $agreement);
         } catch (\Illuminate\Auth\Access\AuthorizationException $ae) {
@@ -67,7 +69,7 @@ class SignatureController extends Controller
         try {
             // Validate input
             $validated = $request->validate([
-                'signature_image' => 'required|string|min:100',
+                'signature_image' => 'required|string|min:50',
                 'signer_name' => 'required|string|max:255',
                 'signer_email' => 'required|email|max:255',
             ]);

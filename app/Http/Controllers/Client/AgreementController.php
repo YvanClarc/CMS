@@ -29,7 +29,7 @@ class AgreementController extends Controller
                     'signed_at' => $agreement->signed_at,
                     'signer_name' => $agreement->signer_name,
                     'signer_email' => $agreement->signer_email,
-                    'signature_image' => $agreement->signature_image,
+            'signature_image' => $agreement->signature_image,
                     'signer_ip_address' => $agreement->signer_ip_address,
                     'signature_timestamp' => $agreement->signature_timestamp,
                     'case' => $agreement->case ? [

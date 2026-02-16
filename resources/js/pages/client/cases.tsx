@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CheckCircle, AlertCircle, Trash2, Upload, X, Plus, FileText, AlertTriangle, FileCheck, Clock } from 'lucide-react';
+import { CheckCircle, AlertCircle, Trash2, Plus, FileText, AlertTriangle, FileCheck, Clock } from 'lucide-react';
 import type { BreadcrumbItem, SharedData } from '@/types';
 
 interface Case {
@@ -84,13 +84,10 @@ export default function CasesPage(props: Props) {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [editingCase, setEditingCase] = useState<Case | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState<{ case: Case | null }>({ case: null });
-  const [deleteDocumentConfirmation, setDeleteDocumentConfirmation] = useState<{ document: CaseDocument | null; caseId: number | null }>({ document: null, caseId: null });
   const [successMessage, setSuccessMessage] = useState('');
-  const [uploadingDocument, setUploadingDocument] = useState(false);
   const [signingAgreement, setSigningAgreement] = useState(false);
   const [decliningAgreement, setDecliningAgreement] = useState(false);
   const [declineReason, setDeclineReason] = useState('');
-  const fileInputRefs = React.useRef<{ [key: number]: HTMLInputElement | null }>({});
 
   const [formStep, setFormStep] = useState(1);
 
@@ -299,110 +296,7 @@ export default function CasesPage(props: Props) {
     });
   };
 
-  const handleUploadDocument = async (e: React.ChangeEvent<HTMLInputElement>, c: Case) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
 
-    setUploadingDocument(true);
-    const formData = new FormData();
-    formData.append('document', file);
-    
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-
-    try {
-      const response = await fetch(`/client/cases/${c.id}/documents`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'X-CSRF-TOKEN': csrfToken,
-        },
-        body: formData,
-      });
-
-      let data;
-      try {
-        data = await response.json();
-      } catch (e) {
-        console.error('Failed to parse response:', response.statusText);
-        alert('Server error. Please check your file and try again.');
-        return;
-      }
-      
-      if (response.ok && data.success) {
-        setSuccessMessage(data.success);
-        // Refresh the cases list
-        router.get('/client/cases', {}, { only: ['cases'] });
-        // Reset the input
-        if (fileInputRefs.current[c.id]) {
-          fileInputRefs.current[c.id]!.value = '';
-        }
-      } else if (data.error) {
-        alert('Error uploading document: ' + data.error);
-      } else {
-        alert('Error uploading document. Please try again.');
-      }
-    } catch (error) {
-      console.error('Upload error:', error);
-      alert('Error uploading document: ' + (error instanceof Error ? error.message : 'Unknown error'));
-    } finally {
-      setUploadingDocument(false);
-    }
-  };
-
-  const triggerFileInput = (caseId: number) => {
-    fileInputRefs.current[caseId]?.click();
-  };
-
-  const handleDeleteDocument = (doc: CaseDocument, caseId: number) => {
-    setDeleteDocumentConfirmation({ document: doc, caseId });
-  };
-
-  const confirmDeleteDocument = () => {
-    const { document: doc, caseId } = deleteDocumentConfirmation;
-    if (!doc || !caseId) return;
-
-    const deleteDocument = async () => {
-      try {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-        const response = await fetch(`/client/cases/${caseId}/documents/${doc.id}`, {
-          method: 'DELETE',
-          headers: {
-            'X-CSRF-TOKEN': csrfToken,
-            'Accept': 'application/json',
-          },
-        });
-
-        let data;
-        try {
-          data = await response.json();
-        } catch (e) {
-          console.error('Failed to parse response:', response.statusText);
-          alert('Server error. Please try again.');
-          return;
-        }
-
-        if (response.ok && data.success) {
-          setDeleteDocumentConfirmation({ document: null, caseId: null });
-          setSuccessMessage(data.success);
-          // Update case documents
-          setCases(cases.map(c => 
-            c.id === caseId 
-              ? { ...c, documents: (c.documents || []).filter(d => d.id !== doc.id) }
-              : c
-          ));
-        } else if (data.error) {
-          alert('Error: ' + data.error);
-        } else {
-          alert('Error deleting document');
-        }
-      } catch (error) {
-        console.error('Delete error:', error);
-        alert('Error deleting document: ' + (error instanceof Error ? error.message : 'Unknown error'));
-      }
-    };
-
-    deleteDocument();
-  };
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
@@ -603,57 +497,24 @@ export default function CasesPage(props: Props) {
                 <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Created on {formatDate(c.created_at)}</p>
 
                 {/* Documents Section */}
-                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
-                  <div className="flex justify-between items-center mb-3">
-                    <h4 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                {c.documents && c.documents.length > 0 && (
+                  <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+                    <h4 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2 mb-3">
                       <FileText className="w-4 h-4 text-blue-600" />
                       Documents
                     </h4>
-                    <div>
-                      <input
-                        ref={(el) => { if (el) fileInputRefs.current[c.id] = el; }}
-                        type="file"
-                        className="hidden"
-                        onChange={(e) => handleUploadDocument(e, c)}
-                        disabled={uploadingDocument}
-                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xlsx,.xls"
-                      />
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={() => triggerFileInput(c.id)}
-                        disabled={uploadingDocument}
-                        className="hover:bg-blue-50 dark:hover:bg-slate-700 gap-2"
-                      >
-                        <Upload className="w-3.5 h-3.5" />
-                        {uploadingDocument ? 'Uploading...' : 'Upload'}
-                      </Button>
-                    </div>
-                  </div>
-
-                  {(!c.documents || c.documents.length === 0) ? (
-                    <p className="text-sm text-slate-500 dark:text-slate-400 italic py-2">No documents uploaded yet</p>
-                  ) : (
                     <div className="space-y-2">
                       {c.documents.map((doc) => (
-                        <div key={doc.id} className="flex justify-between items-center bg-slate-50 dark:bg-slate-700/50 p-3 rounded-lg group/doc hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+                        <div key={doc.id} className="flex justify-between items-center bg-slate-50 dark:bg-slate-700/50 p-3 rounded-lg">
                           <div className="flex-1 min-w-0">
                             <p className="text-slate-900 dark:text-white font-medium text-sm truncate">{doc.file_name}</p>
                             <p className="text-slate-500 dark:text-slate-400 text-xs mt-1">{formatFileSize(doc.file_size)} • {formatDate(doc.created_at)}</p>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteDocument(doc, c.id)}
-                            className="hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 ml-2"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
                         </div>
                       ))}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -1362,27 +1223,7 @@ export default function CasesPage(props: Props) {
           </Dialog>
         )}
 
-        {/* Delete Document Confirmation Modal */}
-        {deleteDocumentConfirmation.document && (
-          <Dialog open={!!deleteDocumentConfirmation.document} onOpenChange={() => setDeleteDocumentConfirmation({ document: null, caseId: null })}>
-            <DialogContent className="max-w-sm">
-              <DialogHeader>
-                <DialogTitle>Delete Document</DialogTitle>
-              </DialogHeader>
-              <p className="text-slate-700 dark:text-slate-300">
-                Are you sure you want to delete <span className="font-semibold">"{deleteDocumentConfirmation.document.file_name}"</span>? This action cannot be undone.
-              </p>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setDeleteDocumentConfirmation({ document: null, caseId: null })}>
-                  Cancel
-                </Button>
-                <Button variant="destructive" onClick={confirmDeleteDocument}>
-                  Delete Document
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        )}
+
 
         {/* Agreement Modal */}
         <Dialog open={showAgreementModal} onOpenChange={setShowAgreementModal}>
