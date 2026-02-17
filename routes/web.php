@@ -3,6 +3,7 @@
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CaseController;
 use App\Http\Controllers\SignatureController;
+use App\Http\Controllers\UserVerificationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -13,6 +14,14 @@ Route::get('/', function () {
         'canRegister' => Features::enabled(Features::registration()),
     ]);
 })->name('home');
+
+// Email verification routes (for authenticated users)
+Route::middleware('auth')->group(function () {
+    Route::get('verify-email', [UserVerificationController::class, 'showVerificationForm'])->name('verify-email');
+    Route::post('send-verification-code', [UserVerificationController::class, 'sendVerificationCode'])->name('send-verification-code');
+    Route::post('verify-email-confirm', [UserVerificationController::class, 'verifyEmail'])->name('verify-email-confirm');
+    Route::post('resend-verification-code', [UserVerificationController::class, 'resendVerificationCode'])->name('resend-verification-code');
+});
 
 // Middleware to redirect to role-specific dashboard after auth
 Route::middleware(['auth', 'verified'])->group(function () {

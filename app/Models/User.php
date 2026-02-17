@@ -32,6 +32,9 @@ class User extends Authenticatable
         'state',
         'zip_code',
         'country',
+        'email_verified_at',
+        'verification_code',
+        'verification_code_expires_at',
     ];
 
     /**
@@ -55,6 +58,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'verification_code_expires_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
         ];
